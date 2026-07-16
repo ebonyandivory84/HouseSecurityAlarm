@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SensorAggregator = void 0;
-exports.parseJsonArray = parseJsonArray;
+const json_1 = require("./json");
 class SensorAggregator {
     constructor(adapter, bus) {
         this.adapter = adapter;
@@ -12,7 +12,7 @@ class SensorAggregator {
     }
     async init() {
         const registryState = await this.adapter.getStateAsync("config.datapointRegistry");
-        const registry = parseJsonArray(registryState?.val);
+        const registry = (0, json_1.parseJsonArray)(registryState?.val);
         for (const dp of registry) {
             if (!dp.enabled) {
                 continue;
@@ -55,15 +55,3 @@ class SensorAggregator {
     }
 }
 exports.SensorAggregator = SensorAggregator;
-function parseJsonArray(raw) {
-    if (typeof raw !== "string") {
-        return [];
-    }
-    try {
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-    }
-    catch {
-        return [];
-    }
-}

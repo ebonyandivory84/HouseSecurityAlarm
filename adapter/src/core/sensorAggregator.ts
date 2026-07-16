@@ -1,5 +1,6 @@
 import type * as utils from "@iobroker/adapter-core";
 import { EventBus } from "./eventBus";
+import { parseJsonArray } from "./json";
 import type { DatapointConfig } from "../config/types";
 
 export class SensorAggregator {
@@ -60,17 +61,5 @@ export class SensorAggregator {
       return Boolean(val);
     }
     return typeof val === "string" && dp.triggerString !== undefined && val === dp.triggerString;
-  }
-}
-
-export function parseJsonArray<T>(raw: unknown): T[] {
-  if (typeof raw !== "string") {
-    return [];
-  }
-  try {
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as T[]) : [];
-  } catch {
-    return [];
   }
 }

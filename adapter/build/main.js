@@ -39,7 +39,13 @@ const objectTree_1 = require("./objects/objectTree");
 const eventBus_1 = require("./core/eventBus");
 const zoneEngine_1 = require("./core/zoneEngine");
 const sensorAggregator_1 = require("./core/sensorAggregator");
+const json_1 = require("./core/json");
 const ruleEvaluator_1 = require("./core/ruleEvaluator");
+const telegram_1 = require("./domain/telegram");
+const cameraController_1 = require("./domain/cameraController");
+const alarmCenterBridge_1 = require("./domain/alarmCenterBridge");
+const dayNightScheduler_1 = require("./domain/dayNightScheduler");
+const presenceTracker_1 = require("./domain/presenceTracker");
 const COMMAND_HANDLERS = {
     "commands.armPerimeter": "armPerimeter",
     "commands.armAussenhaut": "armAussenhaut",
@@ -51,6 +57,7 @@ class HouseSecurityAlarm extends utils.Adapter {
         super({
             ...options,
             name: "housesecurityalarm",
+            useFormatDate: true,
         });
         this.bus = new eventBus_1.EventBus();
         this.on("ready", this.onReady.bind(this));
@@ -64,6 +71,14 @@ class HouseSecurityAlarm extends utils.Adapter {
         this.sensorAggregator = new sensorAggregator_1.SensorAggregator(this, this.bus);
         await this.sensorAggregator.init();
         this.ruleEvaluator = new ruleEvaluator_1.RuleEvaluator(this.sensorAggregator);
+        this.telegramNotifier = new telegram_1.TelegramNotifier(this);
+        this.cameraController = new cameraController_1.CameraController(this, this.sensorAggregator);
+        this.alarmCenterBridge = new alarmCenterBridge_1.AlarmCenterBridge(this, this.bus, this.zoneEngine);
+        await this.alarmCenterBridge.init();
+        this.dayNightScheduler = new dayNightScheduler_1.DayNightScheduler(this, this.sensorAggregator);
+        await this.dayNightScheduler.init();
+        this.presenceTracker = new presenceTracker_1.PresenceTracker(this, this.bus, this.sensorAggregator, this.zoneEngine);
+        await this.presenceTracker.init();
         await this.subscribeStatesAsync("commands.*");
         await this.setStateAsync("info.connection", true, true);
     }
@@ -79,6 +94,10 @@ class HouseSecurityAlarm extends utils.Adapter {
                 return;
             }
         }
+        if (this.alarmCenterBridge.isFingerprintState(id)) {
+            await this.alarmCenterBridge.handleFingerprintMatch(state);
+            return;
+        }
         if (this.sensorAggregator.getDatapoint(id)) {
             this.sensorAggregator.handleForeignStateChange(id, state);
             await this.runRules();
@@ -86,16 +105,28 @@ class HouseSecurityAlarm extends utils.Adapter {
     }
     async runRules() {
         const rulesState = await this.getStateAsync("config.rules");
-        const rules = (0, sensorAggregator_1.parseJsonArray)(rulesState?.val);
+        const rules = (0, json_1.parseJsonArray)(rulesState?.val);
         const actions = this.ruleEvaluator.evaluateRules(rules, this.zoneEngine.getMode());
         for (const action of actions) {
-            if (action.type === "setState") {
-                await this.setForeignStateAsync(action.stateId, action.value, true);
+            switch (action.type) {
+                case "setState":
+                    await this.setForeignStateAsync(action.stateId, action.value, true);
+                    break;
+                case "telegram":
+                    await this.telegramNotifier.notifyByTemplateId(action.templateId);
+                    break;
+                case "cameraLed":
+                    await this.cameraController.setLed(action.cameraId, action.value);
+                    break;
+                case "cameraSiren":
+                    await this.cameraController.setSiren(action.cameraId, action.value);
+                    break;
             }
         }
     }
     onUnload(callback) {
         try {
+            this.dayNightScheduler?.dispose();
             callback();
         }
         catch {

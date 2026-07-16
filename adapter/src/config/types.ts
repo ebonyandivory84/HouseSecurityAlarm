@@ -44,6 +44,7 @@ export interface LogicRule {
 }
 
 export interface TelegramTemplate {
+  id: string;
   triggerId: string;
   messageText: string;
   includeSnapshot: boolean;
@@ -62,4 +63,17 @@ export interface AlarmCenterMapping {
   ledRedStateId: string;
   ledYellowStateId: string;
   fingerprintStateId: string;
+}
+
+export interface DayNightConfig {
+  duskOffsetMin: number;
+  dawnOffsetMin: number;
+  brightnessDatapointId?: string;
+  brightnessNightThreshold?: number;
+  useBrightnessOverride: boolean;
+}
+
+export interface PresenceConfig {
+  datapointIds: string[];
+  autoDisarmOnPresence: boolean;
 }

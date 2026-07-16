@@ -2,8 +2,14 @@ import * as utils from "@iobroker/adapter-core";
 import { bootstrapObjectTree } from "./objects/objectTree";
 import { EventBus } from "./core/eventBus";
 import { ZoneEngine } from "./core/zoneEngine";
-import { SensorAggregator, parseJsonArray } from "./core/sensorAggregator";
+import { SensorAggregator } from "./core/sensorAggregator";
+import { parseJsonArray } from "./core/json";
 import { RuleEvaluator } from "./core/ruleEvaluator";
+import { TelegramNotifier } from "./domain/telegram";
+import { CameraController } from "./domain/cameraController";
+import { AlarmCenterBridge } from "./domain/alarmCenterBridge";
+import { DayNightScheduler } from "./domain/dayNightScheduler";
+import { PresenceTracker } from "./domain/presenceTracker";
 import type { LogicRule } from "./config/types";
 
 const COMMAND_HANDLERS: Record<string, keyof Pick<ZoneEngine, "armPerimeter" | "armAussenhaut" | "armVollschutz" | "disarm">> = {
@@ -18,11 +24,17 @@ class HouseSecurityAlarm extends utils.Adapter {
   private zoneEngine!: ZoneEngine;
   private sensorAggregator!: SensorAggregator;
   private ruleEvaluator!: RuleEvaluator;
+  private telegramNotifier!: TelegramNotifier;
+  private cameraController!: CameraController;
+  private alarmCenterBridge!: AlarmCenterBridge;
+  private dayNightScheduler!: DayNightScheduler;
+  private presenceTracker!: PresenceTracker;
 
   public constructor(options: Partial<utils.AdapterOptions> = {}) {
     super({
       ...options,
       name: "housesecurityalarm",
+      useFormatDate: true,
     });
     this.on("ready", this.onReady.bind(this));
     this.on("stateChange", this.onStateChange.bind(this));
@@ -38,6 +50,18 @@ class HouseSecurityAlarm extends utils.Adapter {
     this.sensorAggregator = new SensorAggregator(this, this.bus);
     await this.sensorAggregator.init();
     this.ruleEvaluator = new RuleEvaluator(this.sensorAggregator);
+
+    this.telegramNotifier = new TelegramNotifier(this);
+    this.cameraController = new CameraController(this, this.sensorAggregator);
+
+    this.alarmCenterBridge = new AlarmCenterBridge(this, this.bus, this.zoneEngine);
+    await this.alarmCenterBridge.init();
+
+    this.dayNightScheduler = new DayNightScheduler(this, this.sensorAggregator);
+    await this.dayNightScheduler.init();
+
+    this.presenceTracker = new PresenceTracker(this, this.bus, this.sensorAggregator, this.zoneEngine);
+    await this.presenceTracker.init();
 
     await this.subscribeStatesAsync("commands.*");
     await this.setStateAsync("info.connection", true, true);
@@ -57,6 +81,11 @@ class HouseSecurityAlarm extends utils.Adapter {
       }
     }
 
+    if (this.alarmCenterBridge.isFingerprintState(id)) {
+      await this.alarmCenterBridge.handleFingerprintMatch(state);
+      return;
+    }
+
     if (this.sensorAggregator.getDatapoint(id)) {
       this.sensorAggregator.handleForeignStateChange(id, state);
       await this.runRules();
@@ -68,14 +97,26 @@ class HouseSecurityAlarm extends utils.Adapter {
     const rules = parseJsonArray<LogicRule>(rulesState?.val);
     const actions = this.ruleEvaluator.evaluateRules(rules, this.zoneEngine.getMode());
     for (const action of actions) {
-      if (action.type === "setState") {
-        await this.setForeignStateAsync(action.stateId, action.value as ioBroker.StateValue, true);
+      switch (action.type) {
+        case "setState":
+          await this.setForeignStateAsync(action.stateId, action.value as ioBroker.StateValue, true);
+          break;
+        case "telegram":
+          await this.telegramNotifier.notifyByTemplateId(action.templateId);
+          break;
+        case "cameraLed":
+          await this.cameraController.setLed(action.cameraId, action.value);
+          break;
+        case "cameraSiren":
+          await this.cameraController.setSiren(action.cameraId, action.value);
+          break;
       }
     }
   }
 
   private onUnload(callback: () => void): void {
     try {
+      this.dayNightScheduler?.dispose();
       callback();
     } catch {
       callback();
