@@ -38,6 +38,8 @@ const utils = __importStar(require("@iobroker/adapter-core"));
 const objectTree_1 = require("./objects/objectTree");
 const eventBus_1 = require("./core/eventBus");
 const zoneEngine_1 = require("./core/zoneEngine");
+const sensorAggregator_1 = require("./core/sensorAggregator");
+const ruleEvaluator_1 = require("./core/ruleEvaluator");
 const COMMAND_HANDLERS = {
     "commands.armPerimeter": "armPerimeter",
     "commands.armAussenhaut": "armAussenhaut",
@@ -59,19 +61,38 @@ class HouseSecurityAlarm extends utils.Adapter {
         await (0, objectTree_1.bootstrapObjectTree)(this);
         this.zoneEngine = new zoneEngine_1.ZoneEngine(this, this.bus);
         await this.zoneEngine.init();
+        this.sensorAggregator = new sensorAggregator_1.SensorAggregator(this, this.bus);
+        await this.sensorAggregator.init();
+        this.ruleEvaluator = new ruleEvaluator_1.RuleEvaluator(this.sensorAggregator);
         await this.subscribeStatesAsync("commands.*");
         await this.setStateAsync("info.connection", true, true);
     }
     async onStateChange(id, state) {
-        if (!state || state.ack || state.val !== true) {
+        if (!state) {
             return;
         }
-        const suffix = Object.keys(COMMAND_HANDLERS).find((key) => id.endsWith(key));
-        if (!suffix) {
-            return;
+        if (!state.ack && state.val === true) {
+            const suffix = Object.keys(COMMAND_HANDLERS).find((key) => id.endsWith(key));
+            if (suffix) {
+                await this.zoneEngine[COMMAND_HANDLERS[suffix]]();
+                await this.setStateAsync(id, false, true);
+                return;
+            }
         }
-        await this.zoneEngine[COMMAND_HANDLERS[suffix]]();
-        await this.setStateAsync(id, false, true);
+        if (this.sensorAggregator.getDatapoint(id)) {
+            this.sensorAggregator.handleForeignStateChange(id, state);
+            await this.runRules();
+        }
+    }
+    async runRules() {
+        const rulesState = await this.getStateAsync("config.rules");
+        const rules = (0, sensorAggregator_1.parseJsonArray)(rulesState?.val);
+        const actions = this.ruleEvaluator.evaluateRules(rules, this.zoneEngine.getMode());
+        for (const action of actions) {
+            if (action.type === "setState") {
+                await this.setForeignStateAsync(action.stateId, action.value, true);
+            }
+        }
     }
     onUnload(callback) {
         try {

@@ -9,6 +9,7 @@ export interface DomainEventMap {
   countdownStarted: { remainingSec: number; ts: number };
   countdownTick: { remainingSec: number };
   countdownStopped: { ts: number };
+  datapointChanged: { datapointId: string; triggered: boolean; zone: string | null; ts: number };
 }
 
 type EventName = keyof DomainEventMap;
