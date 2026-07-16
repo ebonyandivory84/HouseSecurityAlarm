@@ -1,0 +1,26 @@
+{
+  "type": "panel",
+  "items": {
+    "port": {
+      "type": "number",
+      "label": "Port",
+      "min": 1,
+      "max": 65565,
+      "default": 8110,
+      "sm": 12,
+      "md": 4
+    },
+    "devServerUrl": {
+      "type": "text",
+      "label": "Expo Dev-Server URL (leer = Production-Build)",
+      "sm": 12,
+      "md": 8
+    },
+    "enableDevProxy": {
+      "type": "checkbox",
+      "label": "Dev-Proxy aktivieren",
+      "sm": 12,
+      "md": 4
+    }
+  }
+}

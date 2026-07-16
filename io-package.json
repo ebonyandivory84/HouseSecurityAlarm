@@ -1,0 +1,82 @@
+{
+  "common": {
+    "name": "housesecurityalarm",
+    "version": "0.1.0",
+    "news": {
+      "0.1.0": {
+        "en": "initial scaffold",
+        "de": "initiales Scaffold"
+      }
+    },
+    "titleLang": {
+      "en": "House Security Alarm",
+      "de": "Hausalarmanlage"
+    },
+    "desc": {
+      "en": "Zone-based alarm system (Perimeter/Shell/Interior) with hardware AlarmCenter integration and web dashboard",
+      "de": "Zonenbasiertes Alarmsystem (Perimeter/Außenhaut/Innenraum) mit AlarmCenter-Hardware-Anbindung und Web-Dashboard"
+    },
+    "authors": [
+      "ebonyandivory84"
+    ],
+    "licenseInformation": {
+      "license": "MIT",
+      "type": "free"
+    },
+    "platform": "Javascript/Node.js",
+    "mode": "daemon",
+    "main": "main.js",
+    "icon": "housesecurityalarm.png",
+    "enabled": true,
+    "extIcon": "",
+    "readme": "https://github.com/ebonyandivory84/HouseSecurityAlarm/blob/main/README.md",
+    "loglevel": "info",
+    "type": "security",
+    "compact": true,
+    "connectionType": "local",
+    "dataSource": "push",
+    "adminUI": {
+      "config": "json"
+    },
+    "localLinks": {
+      "WebUI": {
+        "link": "%protocol%://%ip%:%port%/",
+        "name": "House Security Alarm"
+      }
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=5.0.19"
+      }
+    ]
+  },
+  "native": {
+    "port": 8110,
+    "devServerUrl": "",
+    "enableDevProxy": false
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Adapter läuft",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "name": "iobroker.housesecurityalarm",
+  "version": "0.1.0",
+  "description": "Modularer ioBroker-Adapter für Alarm-/Zonenschutz (Perimeter/Außenhaut/Innenraum) mit React Native Web Frontend",
+  "main": "main.js",
+  "author": "ebonyandivory84",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ebonyandivory84/HouseSecurityAlarm.git"
+  },
+  "keywords": [
+    "iobroker",
+    "alarm",
+    "security",
+    "adapter"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@iobroker/adapter-core": "^3.2.3",
+    "axios": "^1.9.0",
+    "express": "^4.21.2",
+    "suncalc": "^1.9.0",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@iobroker/testing": "^5.0.4",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.2",
+    "@types/suncalc": "^1.9.2",
+    "@types/ws": "^8.5.13",
+    "typescript": "^5.6.3"
+  },
+  "scripts": {
+    "build": "tsc -p adapter/tsconfig.json",
+    "watch": "tsc -w -p adapter/tsconfig.json",
+    "start": "node main.js"
+  }
+}
