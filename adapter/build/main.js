@@ -35,17 +35,43 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.startAdapter = startAdapter;
 const utils = __importStar(require("@iobroker/adapter-core"));
+const objectTree_1 = require("./objects/objectTree");
+const eventBus_1 = require("./core/eventBus");
+const zoneEngine_1 = require("./core/zoneEngine");
+const COMMAND_HANDLERS = {
+    "commands.armPerimeter": "armPerimeter",
+    "commands.armAussenhaut": "armAussenhaut",
+    "commands.armVollschutz": "armVollschutz",
+    "commands.disarm": "disarm",
+};
 class HouseSecurityAlarm extends utils.Adapter {
     constructor(options = {}) {
         super({
             ...options,
             name: "housesecurityalarm",
         });
+        this.bus = new eventBus_1.EventBus();
         this.on("ready", this.onReady.bind(this));
+        this.on("stateChange", this.onStateChange.bind(this));
         this.on("unload", this.onUnload.bind(this));
     }
     async onReady() {
+        await (0, objectTree_1.bootstrapObjectTree)(this);
+        this.zoneEngine = new zoneEngine_1.ZoneEngine(this, this.bus);
+        await this.zoneEngine.init();
+        await this.subscribeStatesAsync("commands.*");
         await this.setStateAsync("info.connection", true, true);
+    }
+    async onStateChange(id, state) {
+        if (!state || state.ack || state.val !== true) {
+            return;
+        }
+        const suffix = Object.keys(COMMAND_HANDLERS).find((key) => id.endsWith(key));
+        if (!suffix) {
+            return;
+        }
+        await this.zoneEngine[COMMAND_HANDLERS[suffix]]();
+        await this.setStateAsync(id, false, true);
     }
     onUnload(callback) {
         try {
