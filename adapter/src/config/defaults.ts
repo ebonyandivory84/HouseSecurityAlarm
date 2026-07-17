@@ -1,4 +1,4 @@
-import type { DatapointConfig, DayNightConfig, PresenceConfig } from "./types";
+import type { AlarmCenterMapping, DatapointConfig, DayNightConfig, PresenceConfig } from "./types";
 
 export const DEFAULT_DAY_NIGHT_CONFIG: DayNightConfig = {
   duskOffsetMin: 30,
@@ -9,6 +9,19 @@ export const DEFAULT_DAY_NIGHT_CONFIG: DayNightConfig = {
 export const DEFAULT_PRESENCE_CONFIG: PresenceConfig = {
   datapointIds: [],
   autoDisarmOnPresence: false,
+};
+
+export const DEFAULT_ALARM_CENTER_MAPPING: AlarmCenterMapping = {
+  armedStateId: "",
+  perimeterStateId: "",
+  countdownStateId: "",
+  sirenStateId: "",
+  triggerStateId: "",
+  displayStateId: "",
+  buzzerStateId: "",
+  ledRedStateId: "",
+  ledYellowStateId: "",
+  fingerprintStateId: "",
 };
 
 export const DEFAULT_ZONE_BY_CATEGORY: Record<DatapointConfig["category"], DatapointConfig["zone"]> = {

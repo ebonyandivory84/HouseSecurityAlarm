@@ -1,7 +1,7 @@
 import type { Router, Request, Response } from "express";
 import type { ApiDeps } from "./types";
 import { parseJsonArray, parseJsonObject } from "../core/json";
-import { DEFAULT_DAY_NIGHT_CONFIG, DEFAULT_PRESENCE_CONFIG } from "../config/defaults";
+import { DEFAULT_ALARM_CENTER_MAPPING, DEFAULT_DAY_NIGHT_CONFIG, DEFAULT_PRESENCE_CONFIG } from "../config/defaults";
 import type { DatapointConfig } from "../config/types";
 
 const ZONE_COMMANDS = ["armPerimeter", "armAussenhaut", "armVollschutz", "disarm"] as const;
@@ -110,6 +110,14 @@ export function registerRestRoutes(router: Router, deps: ApiDeps): void {
   registerJsonConfigRoute(router, "/config/daynight", "config.dayNight", deps, DEFAULT_DAY_NIGHT_CONFIG, false);
   registerJsonConfigRoute(router, "/config/presence", "config.presence", deps, DEFAULT_PRESENCE_CONFIG, false);
   registerJsonConfigRoute(router, "/config/zones", "config.zoneAssignment", deps, {}, false);
+  registerJsonConfigRoute(
+    router,
+    "/config/alarmcenter-mapping",
+    "config.alarmCenterMapping",
+    deps,
+    DEFAULT_ALARM_CENTER_MAPPING,
+    false
+  );
   registerJsonConfigRoute(router, "/floorplan", "config.floorplan", deps, {}, false);
 
   router.get("/config/datapoints/:category", async (req: Request, res: Response) => {
