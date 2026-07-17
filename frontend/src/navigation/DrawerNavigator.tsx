@@ -16,6 +16,7 @@ import { TelegramScreen as TelegramScreenComponent } from "@/screens/TelegramScr
 import { AlarmCenterScreen as AlarmCenterScreenComponent } from "@/screens/AlarmCenterScreen";
 import { DayNightScreen as DayNightScreenComponent } from "@/screens/DayNightScreen";
 import { PresenceScreen as PresenceScreenComponent } from "@/screens/PresenceScreen";
+import { LogikScreen as LogikScreenComponent } from "@/screens/LogikScreen";
 import { palette, spacing } from "@/theme/palette";
 import type { DatapointCategory } from "@/types/domain";
 
@@ -84,7 +85,7 @@ const TürsensorenScreen = DatapointScreenFor("door", {
 });
 const TelegramScreen = TelegramScreenComponent;
 const AlarmCenterScreen = AlarmCenterScreenComponent;
-const LogikScreen = PlaceholderFor("Logik");
+const LogikScreen = LogikScreenComponent;
 const TagNachtLogikScreen = DayNightScreenComponent;
 const AnwesenheitScreen = PresenceScreenComponent;
 
