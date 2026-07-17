@@ -54,7 +54,8 @@ class HouseSecurityAlarm extends utils.Adapter {
     this.ruleEvaluator = new RuleEvaluator(this.sensorAggregator, this.bus);
 
     this.telegramNotifier = new TelegramNotifier(this);
-    this.cameraController = new CameraController(this, this.sensorAggregator);
+    this.cameraController = new CameraController(this, this.sensorAggregator, this.bus, this.zoneEngine);
+    await this.cameraController.init();
 
     this.alarmCenterBridge = new AlarmCenterBridge(this, this.bus, this.zoneEngine);
     await this.alarmCenterBridge.init();
@@ -99,7 +100,10 @@ class HouseSecurityAlarm extends utils.Adapter {
     if (this.sensorAggregator.getDatapoint(id)) {
       this.sensorAggregator.handleForeignStateChange(id, state);
       await this.runRules();
+      return;
     }
+
+    this.cameraController.handleForeignStateChange(id, state);
   }
 
   private async runRules(): Promise<void> {

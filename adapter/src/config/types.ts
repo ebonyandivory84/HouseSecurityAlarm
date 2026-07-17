@@ -12,6 +12,7 @@ export interface DatapointConfig {
     ledId?: string;
     sirenId?: string;
     isIndoor?: boolean;
+    snapshotStateId?: string;
   };
   enabled: boolean;
 }

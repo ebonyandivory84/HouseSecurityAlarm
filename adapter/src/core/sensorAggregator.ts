@@ -30,6 +30,10 @@ export class SensorAggregator {
     return this.datapoints.get(id);
   }
 
+  public getDatapointsByCategory(category: DatapointConfig["category"]): DatapointConfig[] {
+    return [...this.datapoints.values()].filter((dp) => dp.category === category);
+  }
+
   public isTriggered(id: string): boolean {
     return this.triggeredState.get(id) ?? false;
   }

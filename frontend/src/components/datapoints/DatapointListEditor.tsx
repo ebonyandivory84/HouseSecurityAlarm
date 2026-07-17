@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import { GlassCard } from "@/components/ui/GlassCard";
+import type { CameraSnapshot } from "@/hooks/useCameraSnapshots";
 import { palette, radius, spacing } from "@/theme/palette";
 import { createDefaultDatapointConfig, type DatapointCategory, type DatapointConfig } from "@/types/domain";
 
@@ -10,6 +11,7 @@ interface DatapointListEditorProps {
   liveValues: Record<string, ioBroker.State | null>;
   onSave: (next: DatapointConfig[]) => Promise<void>;
   showCameraCapabilities?: boolean;
+  snapshots?: Record<string, CameraSnapshot>;
   emptyHint: string;
 }
 
@@ -40,6 +42,7 @@ export function DatapointListEditor({
   liveValues,
   onSave,
   showCameraCapabilities = false,
+  snapshots,
   emptyHint,
 }: DatapointListEditorProps): React.JSX.Element {
   const [draft, setDraft] = useState<DatapointConfig[]>(datapoints);
@@ -168,6 +171,13 @@ export function DatapointListEditor({
             {showCameraCapabilities ? (
               <View style={styles.capabilitiesBlock}>
                 <Text style={styles.fieldLabel}>Kamera-Fähigkeiten</Text>
+                {snapshots?.[dp.id] ? (
+                  <Image
+                    source={{ uri: snapshots[dp.id].url }}
+                    style={styles.snapshotImage}
+                    resizeMode="cover"
+                  />
+                ) : null}
                 {CAPABILITY_FIELDS.map(([key, placeholder]) => (
                   <TextInput
                     key={key}
@@ -260,6 +270,12 @@ const styles = StyleSheet.create({
   chipLabel: { color: palette.textSecondary, fontSize: 12, fontWeight: "600" },
   chipLabelActive: { color: palette.background },
   capabilitiesBlock: { gap: spacing.sm, marginTop: spacing.xs },
+  snapshotImage: {
+    width: "100%",
+    aspectRatio: 16 / 9,
+    borderRadius: radius.chip,
+    backgroundColor: palette.zoneOff,
+  },
   switchRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   switchLabel: { color: palette.textSecondary, fontSize: 13 },
   addButton: {

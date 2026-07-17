@@ -44,6 +44,7 @@ export interface CameraCapabilities {
   ledId?: string;
   sirenId?: string;
   isIndoor?: boolean;
+  snapshotStateId?: string;
 }
 
 export interface DatapointConfig {

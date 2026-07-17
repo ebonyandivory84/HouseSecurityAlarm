@@ -2,6 +2,7 @@ import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { DatapointListEditor } from "@/components/datapoints/DatapointListEditor";
 import { useDatapointCategory } from "@/hooks/useDatapointCategory";
+import { useCameraSnapshots } from "@/hooks/useCameraSnapshots";
 import { palette, spacing } from "@/theme/palette";
 import type { DatapointCategory } from "@/types/domain";
 
@@ -17,6 +18,7 @@ export function DatapointCategoryScreen({
   showCameraCapabilities = false,
 }: DatapointCategoryScreenProps): React.JSX.Element {
   const { datapoints, liveValues, isLoading, error, save } = useDatapointCategory(category);
+  const { snapshots } = useCameraSnapshots(showCameraCapabilities);
 
   if (isLoading) {
     return (
@@ -35,6 +37,7 @@ export function DatapointCategoryScreen({
         liveValues={liveValues}
         onSave={save}
         showCameraCapabilities={showCameraCapabilities}
+        snapshots={snapshots}
         emptyHint={emptyHint}
       />
     </View>

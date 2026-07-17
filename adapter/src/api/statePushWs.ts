@@ -74,11 +74,17 @@ export function attachStatePushWs(server: Server, deps: ApiDeps): StatePushWsHan
   };
   deps.bus.on("ruleTrace", onRuleTrace);
 
+  const onCameraSnapshot = (payload: DomainEventMap["cameraSnapshot"]): void => {
+    broadcastAll({ type: "cameraSnapshot", ...payload });
+  };
+  deps.bus.on("cameraSnapshot", onCameraSnapshot);
+
   return {
     broadcast: broadcastAll,
     async dispose(): Promise<void> {
       deps.adapter.off("stateChange", onStateChange);
       deps.bus.off("ruleTrace", onRuleTrace);
+      deps.bus.off("cameraSnapshot", onCameraSnapshot);
       for (const socket of watchedIds.keys()) {
         socket.close();
       }

@@ -12,6 +12,7 @@ export interface DomainEventMap {
   countdownStopped: { ts: number };
   datapointChanged: { datapointId: string; triggered: boolean; zone: string | null; ts: number };
   ruleTrace: { ruleId: string; ruleName: string; actions: RuleAction[]; ts: number };
+  cameraSnapshot: { cameraId: string; url: string; ts: number };
 }
 
 type EventName = keyof DomainEventMap;
