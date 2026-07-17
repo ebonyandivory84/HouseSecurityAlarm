@@ -80,3 +80,16 @@ export function createDefaultDatapointConfig(
     enabled: true,
   };
 }
+
+export interface AlarmCenterMapping {
+  armedStateId: string;
+  perimeterStateId: string;
+  countdownStateId: string;
+  sirenStateId: string;
+  triggerStateId: string;
+  displayStateId: string;
+  buzzerStateId: string;
+  ledRedStateId: string;
+  ledYellowStateId: string;
+  fingerprintStateId: string;
+}
