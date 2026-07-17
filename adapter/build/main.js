@@ -46,6 +46,7 @@ const cameraController_1 = require("./domain/cameraController");
 const alarmCenterBridge_1 = require("./domain/alarmCenterBridge");
 const dayNightScheduler_1 = require("./domain/dayNightScheduler");
 const presenceTracker_1 = require("./domain/presenceTracker");
+const server_1 = require("./api/server");
 const COMMAND_HANDLERS = {
     "commands.armPerimeter": "armPerimeter",
     "commands.armAussenhaut": "armAussenhaut",
@@ -70,7 +71,7 @@ class HouseSecurityAlarm extends utils.Adapter {
         await this.zoneEngine.init();
         this.sensorAggregator = new sensorAggregator_1.SensorAggregator(this, this.bus);
         await this.sensorAggregator.init();
-        this.ruleEvaluator = new ruleEvaluator_1.RuleEvaluator(this.sensorAggregator);
+        this.ruleEvaluator = new ruleEvaluator_1.RuleEvaluator(this.sensorAggregator, this.bus);
         this.telegramNotifier = new telegram_1.TelegramNotifier(this);
         this.cameraController = new cameraController_1.CameraController(this, this.sensorAggregator);
         this.alarmCenterBridge = new alarmCenterBridge_1.AlarmCenterBridge(this, this.bus, this.zoneEngine);
@@ -79,6 +80,13 @@ class HouseSecurityAlarm extends utils.Adapter {
         await this.dayNightScheduler.init();
         this.presenceTracker = new presenceTracker_1.PresenceTracker(this, this.bus, this.sensorAggregator, this.zoneEngine);
         await this.presenceTracker.init();
+        this.apiServer = await (0, server_1.startApiServer)({
+            adapter: this,
+            bus: this.bus,
+            zoneEngine: this.zoneEngine,
+            sensorAggregator: this.sensorAggregator,
+            telegramNotifier: this.telegramNotifier,
+        });
         await this.subscribeStatesAsync("commands.*");
         await this.setStateAsync("info.connection", true, true);
     }
@@ -124,9 +132,10 @@ class HouseSecurityAlarm extends utils.Adapter {
             }
         }
     }
-    onUnload(callback) {
+    async onUnload(callback) {
         try {
             this.dayNightScheduler?.dispose();
+            await this.apiServer?.dispose();
             callback();
         }
         catch {

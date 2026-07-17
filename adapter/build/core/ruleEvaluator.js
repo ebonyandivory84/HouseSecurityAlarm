@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RuleEvaluator = void 0;
 class RuleEvaluator {
-    constructor(sensors) {
+    constructor(sensors, bus) {
         this.sensors = sensors;
+        this.bus = bus;
     }
     evaluateRules(rules, mode) {
         const actions = [];
@@ -13,6 +14,7 @@ class RuleEvaluator {
             }
             if (this.evaluateGroup(rule.when)) {
                 actions.push(...rule.then);
+                this.bus?.emit("ruleTrace", { ruleId: rule.id, ruleName: rule.name, actions: rule.then, ts: Date.now() });
             }
         }
         return actions;

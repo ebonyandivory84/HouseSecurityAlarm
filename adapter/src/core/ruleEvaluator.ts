@@ -1,9 +1,12 @@
 import type { ConditionGroup, ConditionLeaf, LogicRule, RuleAction } from "../config/types";
 import type { SensorAggregator } from "./sensorAggregator";
-import type { ZoneMode } from "./eventBus";
+import type { EventBus, ZoneMode } from "./eventBus";
 
 export class RuleEvaluator {
-  public constructor(private readonly sensors: SensorAggregator) {}
+  public constructor(
+    private readonly sensors: SensorAggregator,
+    private readonly bus?: EventBus
+  ) {}
 
   public evaluateRules(rules: LogicRule[], mode: ZoneMode): RuleAction[] {
     const actions: RuleAction[] = [];
@@ -13,6 +16,7 @@ export class RuleEvaluator {
       }
       if (this.evaluateGroup(rule.when)) {
         actions.push(...rule.then);
+        this.bus?.emit("ruleTrace", { ruleId: rule.id, ruleName: rule.name, actions: rule.then, ts: Date.now() });
       }
     }
     return actions;

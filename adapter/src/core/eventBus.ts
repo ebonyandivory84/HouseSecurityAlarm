@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import type { RuleAction } from "../config/types";
 
 export type ZoneMode = "unscharf" | "perimeter" | "aussenhaut" | "vollschutz";
 
@@ -10,6 +11,7 @@ export interface DomainEventMap {
   countdownTick: { remainingSec: number };
   countdownStopped: { ts: number };
   datapointChanged: { datapointId: string; triggered: boolean; zone: string | null; ts: number };
+  ruleTrace: { ruleId: string; ruleName: string; actions: RuleAction[]; ts: number };
 }
 
 type EventName = keyof DomainEventMap;

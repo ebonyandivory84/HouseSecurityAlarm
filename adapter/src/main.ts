@@ -10,6 +10,7 @@ import { CameraController } from "./domain/cameraController";
 import { AlarmCenterBridge } from "./domain/alarmCenterBridge";
 import { DayNightScheduler } from "./domain/dayNightScheduler";
 import { PresenceTracker } from "./domain/presenceTracker";
+import { startApiServer, type ApiServerHandle } from "./api/server";
 import type { LogicRule } from "./config/types";
 
 const COMMAND_HANDLERS: Record<string, keyof Pick<ZoneEngine, "armPerimeter" | "armAussenhaut" | "armVollschutz" | "disarm">> = {
@@ -29,6 +30,7 @@ class HouseSecurityAlarm extends utils.Adapter {
   private alarmCenterBridge!: AlarmCenterBridge;
   private dayNightScheduler!: DayNightScheduler;
   private presenceTracker!: PresenceTracker;
+  private apiServer?: ApiServerHandle;
 
   public constructor(options: Partial<utils.AdapterOptions> = {}) {
     super({
@@ -49,7 +51,7 @@ class HouseSecurityAlarm extends utils.Adapter {
 
     this.sensorAggregator = new SensorAggregator(this, this.bus);
     await this.sensorAggregator.init();
-    this.ruleEvaluator = new RuleEvaluator(this.sensorAggregator);
+    this.ruleEvaluator = new RuleEvaluator(this.sensorAggregator, this.bus);
 
     this.telegramNotifier = new TelegramNotifier(this);
     this.cameraController = new CameraController(this, this.sensorAggregator);
@@ -62,6 +64,14 @@ class HouseSecurityAlarm extends utils.Adapter {
 
     this.presenceTracker = new PresenceTracker(this, this.bus, this.sensorAggregator, this.zoneEngine);
     await this.presenceTracker.init();
+
+    this.apiServer = await startApiServer({
+      adapter: this,
+      bus: this.bus,
+      zoneEngine: this.zoneEngine,
+      sensorAggregator: this.sensorAggregator,
+      telegramNotifier: this.telegramNotifier,
+    });
 
     await this.subscribeStatesAsync("commands.*");
     await this.setStateAsync("info.connection", true, true);
@@ -114,9 +124,10 @@ class HouseSecurityAlarm extends utils.Adapter {
     }
   }
 
-  private onUnload(callback: () => void): void {
+  private async onUnload(callback: () => void): Promise<void> {
     try {
       this.dayNightScheduler?.dispose();
+      await this.apiServer?.dispose();
       callback();
     } catch {
       callback();
