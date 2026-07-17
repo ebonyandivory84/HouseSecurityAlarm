@@ -109,3 +109,8 @@ export const DAY_NIGHT_MODE_LABELS: Record<DayNightMode, string> = {
   dusk: "Dämmerung",
   night: "Nacht",
 };
+
+export interface PresenceConfig {
+  datapointIds: string[];
+  autoDisarmOnPresence: boolean;
+}
