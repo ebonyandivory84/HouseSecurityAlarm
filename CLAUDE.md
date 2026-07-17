@@ -5,7 +5,7 @@ Erbt Regeln aus `projects/coding/CLAUDE.md`.
 ## Projektkontext
 - **Ziel**: Zonenbasiertes Alarmsystem (Perimeter/Außenhaut/Innenraum) als eigenständiger ioBroker-Adapter mit React Native Web-Dashboard — löst 23 einzelne ioBroker-JavaScripts aus `AlarmSystem/old scripts/` schrittweise ab
 - **Typ**: ioBroker Adapter (`type: security`) + React Native Web Frontend, `daemon`, `compact: true`
-- **Status**: M1–M8 abgeschlossen (Backend, Frontend, Legacy-Parität), Produktiv-Deploy ausstehend
+- **Status**: M1–M9 + Produktiv-Deploy abgeschlossen, Adapter läuft stabil auf dem Raspberry Pi (Port 8110)
 - **GitHub**: https://github.com/ebonyandivory84/HouseSecurityAlarm
 - **Auftraggeber**: Eigenprojekt
 
@@ -93,3 +93,4 @@ cp -R dist/. ../adapter/www/
 - `2026-07-16` — Clean-Room-Neubau statt Weiterentwicklung von AlarmSystem (AskUserQuestion)
 - `2026-07-16` — Frontend-Stack: React Native Web + Expo, konsistent mit SmartHome Dashboard (AskUserQuestion)
 - `2026-07-16` — Deploy-Muster: plain CommonJS (`main.js`) statt `projects/coding/CLAUDE.md`-Vorgabe, da nachweislich funktionierend bei SmartHome Dashboard
+- `2026-07-17` — Produktiv-Deploy-Bugfix: `main.js` destrukturierte `{ startAdapter }` aus `adapter/build/main.js`, das aber `module.exports = startAdapter` (bare Function) exportiert → `TypeError: startAdapter is not a function` beim Start. Fix: Destrukturierung entfernt (`const startAdapter = require(...)`), Adapter läuft seither stabil.
