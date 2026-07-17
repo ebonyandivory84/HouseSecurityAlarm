@@ -14,6 +14,7 @@ import { PlaceholderScreen } from "@/screens/PlaceholderScreen";
 import { DatapointCategoryScreen } from "@/screens/DatapointCategoryScreen";
 import { TelegramScreen as TelegramScreenComponent } from "@/screens/TelegramScreen";
 import { AlarmCenterScreen as AlarmCenterScreenComponent } from "@/screens/AlarmCenterScreen";
+import { DayNightScreen as DayNightScreenComponent } from "@/screens/DayNightScreen";
 import { palette, spacing } from "@/theme/palette";
 import type { DatapointCategory } from "@/types/domain";
 
@@ -83,7 +84,7 @@ const TürsensorenScreen = DatapointScreenFor("door", {
 const TelegramScreen = TelegramScreenComponent;
 const AlarmCenterScreen = AlarmCenterScreenComponent;
 const LogikScreen = PlaceholderFor("Logik");
-const TagNachtLogikScreen = PlaceholderFor("Tag-Nacht-Logik");
+const TagNachtLogikScreen = DayNightScreenComponent;
 const AnwesenheitScreen = PlaceholderFor("Anwesenheit");
 
 function GlassDrawerContent(props: DrawerContentComponentProps): React.JSX.Element {

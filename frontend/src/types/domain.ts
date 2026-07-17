@@ -93,3 +93,19 @@ export interface AlarmCenterMapping {
   ledYellowStateId: string;
   fingerprintStateId: string;
 }
+
+export type DayNightMode = "day" | "dusk" | "night";
+
+export interface DayNightConfig {
+  duskOffsetMin: number;
+  dawnOffsetMin: number;
+  brightnessDatapointId?: string;
+  brightnessNightThreshold?: number;
+  useBrightnessOverride: boolean;
+}
+
+export const DAY_NIGHT_MODE_LABELS: Record<DayNightMode, string> = {
+  day: "Tag",
+  dusk: "Dämmerung",
+  night: "Nacht",
+};
