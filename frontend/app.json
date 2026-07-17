@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "HouseSecurityAlarm",
+    "slug": "housesecurityalarm",
+    "version": "0.1.0",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-asset"
+    ]
+  }
+}
