@@ -11,7 +11,9 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { OverviewScreen } from "@/screens/OverviewScreen";
 import { ZonesScreen } from "@/screens/ZonesScreen";
 import { PlaceholderScreen } from "@/screens/PlaceholderScreen";
+import { DatapointCategoryScreen } from "@/screens/DatapointCategoryScreen";
 import { palette, spacing } from "@/theme/palette";
+import type { DatapointCategory } from "@/types/domain";
 
 const TABLET_BREAKPOINT = 768;
 const DRAWER_WIDTH_TABLET = 260;
@@ -51,9 +53,31 @@ function PlaceholderFor(title: string) {
   };
 }
 
-const KamerasScreen = PlaceholderFor("Kameras");
-const MotionScreen = PlaceholderFor("Motion");
-const TürsensorenScreen = PlaceholderFor("Türsensoren");
+function DatapointScreenFor(
+  category: DatapointCategory,
+  options: { emptyHint: string; showCameraCapabilities?: boolean }
+) {
+  return function ScreenWrapper(): React.JSX.Element {
+    return (
+      <DatapointCategoryScreen
+        category={category}
+        emptyHint={options.emptyHint}
+        showCameraCapabilities={options.showCameraCapabilities}
+      />
+    );
+  };
+}
+
+const KamerasScreen = DatapointScreenFor("camera", {
+  showCameraCapabilities: true,
+  emptyHint: "Keine Kameras konfiguriert. Unten einen Datenpunkt hinzufügen.",
+});
+const MotionScreen = DatapointScreenFor("motion", {
+  emptyHint: "Keine Bewegungsmelder konfiguriert. Unten einen Datenpunkt hinzufügen.",
+});
+const TürsensorenScreen = DatapointScreenFor("door", {
+  emptyHint: "Keine Türsensoren konfiguriert. Unten einen Datenpunkt hinzufügen.",
+});
 const TelegramScreen = PlaceholderFor("Telegram");
 const AlarmCenterScreen = PlaceholderFor("AlarmCenter");
 const LogikScreen = PlaceholderFor("Logik");

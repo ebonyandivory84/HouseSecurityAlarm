@@ -34,3 +34,49 @@ export const ZONE_MODE_LABELS: Record<ZoneMode, string> = {
   aussenhaut: "Außenhautschutz",
   vollschutz: "Vollschutz",
 };
+
+export type DatapointCategory = "camera" | "motion" | "door" | "presence" | "brightness" | "custom";
+
+export interface CameraCapabilities {
+  personDetectionId?: string;
+  animalDetectionId?: string;
+  objectDetectionId?: string;
+  ledId?: string;
+  sirenId?: string;
+  isIndoor?: boolean;
+}
+
+export interface DatapointConfig {
+  id: string;
+  category: DatapointCategory;
+  label: string;
+  valueType: "boolean" | "string";
+  triggerString?: string;
+  zone?: "perimeter" | "aussenhaut" | "innenraum" | null;
+  cameraCapabilities?: CameraCapabilities;
+  enabled: boolean;
+}
+
+export const DEFAULT_ZONE_BY_CATEGORY: Record<DatapointCategory, DatapointConfig["zone"]> = {
+  camera: "perimeter",
+  motion: "innenraum",
+  door: "aussenhaut",
+  presence: null,
+  brightness: null,
+  custom: null,
+};
+
+export function createDefaultDatapointConfig(
+  id: string,
+  category: DatapointCategory,
+  label: string
+): DatapointConfig {
+  return {
+    id,
+    category,
+    label,
+    valueType: "boolean",
+    zone: DEFAULT_ZONE_BY_CATEGORY[category],
+    enabled: true,
+  };
+}
