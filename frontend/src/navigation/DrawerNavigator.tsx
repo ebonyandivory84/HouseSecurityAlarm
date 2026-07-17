@@ -12,6 +12,7 @@ import { OverviewScreen } from "@/screens/OverviewScreen";
 import { ZonesScreen } from "@/screens/ZonesScreen";
 import { PlaceholderScreen } from "@/screens/PlaceholderScreen";
 import { DatapointCategoryScreen } from "@/screens/DatapointCategoryScreen";
+import { TelegramScreen as TelegramScreenComponent } from "@/screens/TelegramScreen";
 import { palette, spacing } from "@/theme/palette";
 import type { DatapointCategory } from "@/types/domain";
 
@@ -78,7 +79,7 @@ const MotionScreen = DatapointScreenFor("motion", {
 const TürsensorenScreen = DatapointScreenFor("door", {
   emptyHint: "Keine Türsensoren konfiguriert. Unten einen Datenpunkt hinzufügen.",
 });
-const TelegramScreen = PlaceholderFor("Telegram");
+const TelegramScreen = TelegramScreenComponent;
 const AlarmCenterScreen = PlaceholderFor("AlarmCenter");
 const LogikScreen = PlaceholderFor("Logik");
 const TagNachtLogikScreen = PlaceholderFor("Tag-Nacht-Logik");
