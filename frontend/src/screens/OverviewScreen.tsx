@@ -2,6 +2,7 @@ import React from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useAlarmCenterStatus } from "@/hooks/useAlarmCenterStatus";
+import { iobrokerClient } from "@/services/iobrokerClient";
 import { palette, radius, spacing } from "@/theme/palette";
 import { ZONE_MODE_LABELS, type ZoneCommand } from "@/types/domain";
 
@@ -87,6 +88,13 @@ export function OverviewScreen(): React.JSX.Element {
           );
         })}
       </View>
+
+      <Pressable
+        onPress={() => void iobrokerClient.writeState("commands.panic", true, false)}
+        style={({ pressed }) => [styles.panicButton, { opacity: pressed ? 0.7 : 1 }]}
+      >
+        <Text style={styles.panicLabel}>PANIK</Text>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -162,5 +170,17 @@ const styles = StyleSheet.create({
   commandLabel: {
     fontSize: 15,
     fontWeight: "700",
+  },
+  panicButton: {
+    paddingVertical: spacing.md,
+    borderRadius: radius.chip,
+    backgroundColor: palette.danger,
+    alignItems: "center",
+  },
+  panicLabel: {
+    color: palette.background,
+    fontSize: 16,
+    fontWeight: "800",
+    letterSpacing: 1,
   },
 });

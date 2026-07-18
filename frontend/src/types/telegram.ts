@@ -1,3 +1,4 @@
+// SYNC: adapter/src/config/types.ts ↔ frontend/src/types/telegram.ts — bei Änderung beide Seiten pflegen
 export interface TelegramTemplate {
   id: string;
   triggerId: string;

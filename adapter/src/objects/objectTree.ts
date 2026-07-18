@@ -67,6 +67,10 @@ const states: StateDef[] = [
     _id: "commands.disarm",
     common: { name: "Unscharf schalten", type: "boolean", role: "button", read: false, write: true, def: false },
   },
+  {
+    _id: "commands.panic",
+    common: { name: "Panik auslösen", type: "boolean", role: "button", read: false, write: true, def: false },
+  },
 
   {
     _id: "alarm.active",
@@ -164,6 +168,10 @@ const states: StateDef[] = [
   {
     _id: "config.floorplan",
     common: { name: "Grundriss-Konfiguration", type: "string", role: "json", read: true, write: true, def: "{}" },
+  },
+  {
+    _id: "config.alarmTiming",
+    common: { name: "Alarm-Zeitkonfiguration", type: "string", role: "json", read: true, write: true, def: "{}" },
   },
 ];
 

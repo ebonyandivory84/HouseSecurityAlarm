@@ -96,7 +96,9 @@ function registerRestRoutes(router, deps) {
     registerJsonConfigRoute(router, "/config/daynight", "config.dayNight", deps, defaults_1.DEFAULT_DAY_NIGHT_CONFIG, false);
     registerJsonConfigRoute(router, "/config/presence", "config.presence", deps, defaults_1.DEFAULT_PRESENCE_CONFIG, false);
     registerJsonConfigRoute(router, "/config/zones", "config.zoneAssignment", deps, {}, false);
-    registerJsonConfigRoute(router, "/floorplan", "config.floorplan", deps, {}, false);
+    registerJsonConfigRoute(router, "/config/alarmcenter-mapping", "config.alarmCenterMapping", deps, defaults_1.DEFAULT_ALARM_CENTER_MAPPING, false);
+    registerJsonConfigRoute(router, "/floorplan", "config.floorplan", deps, defaults_1.DEFAULT_FLOORPLAN_CONFIG, false);
+    registerJsonConfigRoute(router, "/config/alarmtiming", "config.alarmTiming", deps, defaults_1.DEFAULT_ALARM_TIMING_CONFIG, false);
     router.get("/config/datapoints/:category", async (req, res) => {
         try {
             const state = await deps.adapter.getStateAsync("config.datapointRegistry");

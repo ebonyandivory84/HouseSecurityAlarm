@@ -10,13 +10,13 @@ import {
 import { GlassCard } from "@/components/ui/GlassCard";
 import { OverviewScreen } from "@/screens/OverviewScreen";
 import { ZonesScreen } from "@/screens/ZonesScreen";
-import { PlaceholderScreen } from "@/screens/PlaceholderScreen";
 import { DatapointCategoryScreen } from "@/screens/DatapointCategoryScreen";
 import { TelegramScreen as TelegramScreenComponent } from "@/screens/TelegramScreen";
 import { AlarmCenterScreen as AlarmCenterScreenComponent } from "@/screens/AlarmCenterScreen";
 import { DayNightScreen as DayNightScreenComponent } from "@/screens/DayNightScreen";
 import { PresenceScreen as PresenceScreenComponent } from "@/screens/PresenceScreen";
 import { LogikScreen as LogikScreenComponent } from "@/screens/LogikScreen";
+import { FloorplanScreen as FloorplanScreenComponent } from "@/screens/FloorplanScreen";
 import { palette, spacing } from "@/theme/palette";
 import type { DatapointCategory } from "@/types/domain";
 
@@ -35,6 +35,7 @@ type DrawerParamList = {
   Logik: undefined;
   "Tag-Nacht-Logik": undefined;
   Anwesenheit: undefined;
+  Grundriss: undefined;
 };
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
@@ -50,13 +51,8 @@ const ICONS: Record<keyof DrawerParamList, keyof typeof Ionicons.glyphMap> = {
   Logik: "git-branch-outline",
   "Tag-Nacht-Logik": "moon-outline",
   Anwesenheit: "people-outline",
+  Grundriss: "map-outline",
 };
-
-function PlaceholderFor(title: string) {
-  return function ScreenWrapper(): React.JSX.Element {
-    return <PlaceholderScreen title={title} />;
-  };
-}
 
 function DatapointScreenFor(
   category: DatapointCategory,
@@ -88,6 +84,7 @@ const AlarmCenterScreen = AlarmCenterScreenComponent;
 const LogikScreen = LogikScreenComponent;
 const TagNachtLogikScreen = DayNightScreenComponent;
 const AnwesenheitScreen = PresenceScreenComponent;
+const GrundrissScreen = FloorplanScreenComponent;
 
 function GlassDrawerContent(props: DrawerContentComponentProps): React.JSX.Element {
   return (
@@ -141,6 +138,7 @@ export function DrawerNavigator(): React.JSX.Element {
       <Drawer.Screen name="Logik" component={LogikScreen} />
       <Drawer.Screen name="Tag-Nacht-Logik" component={TagNachtLogikScreen} />
       <Drawer.Screen name="Anwesenheit" component={AnwesenheitScreen} />
+      <Drawer.Screen name="Grundriss" component={GrundrissScreen} />
     </Drawer.Navigator>
   );
 }

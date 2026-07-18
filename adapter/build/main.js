@@ -39,6 +39,7 @@ const objectTree_1 = require("./objects/objectTree");
 const eventBus_1 = require("./core/eventBus");
 const zoneEngine_1 = require("./core/zoneEngine");
 const sensorAggregator_1 = require("./core/sensorAggregator");
+const alarmController_1 = require("./core/alarmController");
 const json_1 = require("./core/json");
 const ruleEvaluator_1 = require("./core/ruleEvaluator");
 const telegram_1 = require("./domain/telegram");
@@ -71,9 +72,12 @@ class HouseSecurityAlarm extends utils.Adapter {
         await this.zoneEngine.init();
         this.sensorAggregator = new sensorAggregator_1.SensorAggregator(this, this.bus);
         await this.sensorAggregator.init();
+        this.alarmController = new alarmController_1.AlarmController(this, this.bus, this.zoneEngine, this.sensorAggregator);
+        await this.alarmController.init();
         this.ruleEvaluator = new ruleEvaluator_1.RuleEvaluator(this.sensorAggregator, this.bus);
         this.telegramNotifier = new telegram_1.TelegramNotifier(this);
-        this.cameraController = new cameraController_1.CameraController(this, this.sensorAggregator);
+        this.cameraController = new cameraController_1.CameraController(this, this.sensorAggregator, this.bus, this.zoneEngine);
+        await this.cameraController.init();
         this.alarmCenterBridge = new alarmCenterBridge_1.AlarmCenterBridge(this, this.bus, this.zoneEngine);
         await this.alarmCenterBridge.init();
         this.dayNightScheduler = new dayNightScheduler_1.DayNightScheduler(this, this.sensorAggregator);
@@ -95,6 +99,11 @@ class HouseSecurityAlarm extends utils.Adapter {
             return;
         }
         if (!state.ack && state.val === true) {
+            if (id.endsWith("commands.panic")) {
+                await this.alarmController.panic();
+                await this.setStateAsync(id, false, true);
+                return;
+            }
             const suffix = Object.keys(COMMAND_HANDLERS).find((key) => id.endsWith(key));
             if (suffix) {
                 await this.zoneEngine[COMMAND_HANDLERS[suffix]]();
@@ -109,7 +118,9 @@ class HouseSecurityAlarm extends utils.Adapter {
         if (this.sensorAggregator.getDatapoint(id)) {
             this.sensorAggregator.handleForeignStateChange(id, state);
             await this.runRules();
+            return;
         }
+        this.cameraController.handleForeignStateChange(id, state);
     }
     async runRules() {
         const rulesState = await this.getStateAsync("config.rules");
@@ -135,6 +146,7 @@ class HouseSecurityAlarm extends utils.Adapter {
     async onUnload(callback) {
         try {
             this.dayNightScheduler?.dispose();
+            this.alarmController?.dispose();
             await this.apiServer?.dispose();
             callback();
         }

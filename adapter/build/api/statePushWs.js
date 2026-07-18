@@ -53,11 +53,16 @@ function attachStatePushWs(server, deps) {
         broadcastAll({ type: "ruleTrace", ...payload });
     };
     deps.bus.on("ruleTrace", onRuleTrace);
+    const onCameraSnapshot = (payload) => {
+        broadcastAll({ type: "cameraSnapshot", ...payload });
+    };
+    deps.bus.on("cameraSnapshot", onCameraSnapshot);
     return {
         broadcast: broadcastAll,
         async dispose() {
             deps.adapter.off("stateChange", onStateChange);
             deps.bus.off("ruleTrace", onRuleTrace);
+            deps.bus.off("cameraSnapshot", onCameraSnapshot);
             for (const socket of watchedIds.keys()) {
                 socket.close();
             }

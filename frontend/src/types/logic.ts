@@ -1,5 +1,6 @@
 export type ConditionComparator = "triggered" | "equals" | "above" | "below";
 
+// SYNC: adapter/src/config/types.ts ↔ frontend/src/types/logic.ts — bei Änderung beide Seiten pflegen
 export interface ConditionLeaf {
   kind: "leaf";
   datapointId: string;

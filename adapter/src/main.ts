@@ -3,6 +3,7 @@ import { bootstrapObjectTree } from "./objects/objectTree";
 import { EventBus } from "./core/eventBus";
 import { ZoneEngine } from "./core/zoneEngine";
 import { SensorAggregator } from "./core/sensorAggregator";
+import { AlarmController } from "./core/alarmController";
 import { parseJsonArray } from "./core/json";
 import { RuleEvaluator } from "./core/ruleEvaluator";
 import { TelegramNotifier } from "./domain/telegram";
@@ -24,6 +25,7 @@ class HouseSecurityAlarm extends utils.Adapter {
   private readonly bus = new EventBus();
   private zoneEngine!: ZoneEngine;
   private sensorAggregator!: SensorAggregator;
+  private alarmController!: AlarmController;
   private ruleEvaluator!: RuleEvaluator;
   private telegramNotifier!: TelegramNotifier;
   private cameraController!: CameraController;
@@ -51,6 +53,9 @@ class HouseSecurityAlarm extends utils.Adapter {
 
     this.sensorAggregator = new SensorAggregator(this, this.bus);
     await this.sensorAggregator.init();
+
+    this.alarmController = new AlarmController(this, this.bus, this.zoneEngine, this.sensorAggregator);
+    await this.alarmController.init();
     this.ruleEvaluator = new RuleEvaluator(this.sensorAggregator, this.bus);
 
     this.telegramNotifier = new TelegramNotifier(this);
@@ -84,6 +89,12 @@ class HouseSecurityAlarm extends utils.Adapter {
     }
 
     if (!state.ack && state.val === true) {
+      if (id.endsWith("commands.panic")) {
+        await this.alarmController.panic();
+        await this.setStateAsync(id, false, true);
+        return;
+      }
+
       const suffix = Object.keys(COMMAND_HANDLERS).find((key) => id.endsWith(key));
       if (suffix) {
         await this.zoneEngine[COMMAND_HANDLERS[suffix]]();
@@ -131,6 +142,7 @@ class HouseSecurityAlarm extends utils.Adapter {
   private async onUnload(callback: () => void): Promise<void> {
     try {
       this.dayNightScheduler?.dispose();
+      this.alarmController?.dispose();
       await this.apiServer?.dispose();
       callback();
     } catch {

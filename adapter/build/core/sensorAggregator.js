@@ -25,6 +25,9 @@ class SensorAggregator {
     getDatapoint(id) {
         return this.datapoints.get(id);
     }
+    getDatapointsByCategory(category) {
+        return [...this.datapoints.values()].filter((dp) => dp.category === category);
+    }
     isTriggered(id) {
         return this.triggeredState.get(id) ?? false;
     }

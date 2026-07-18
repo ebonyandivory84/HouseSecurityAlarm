@@ -3,8 +3,9 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, 
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useAlarmCenterMapping } from "@/hooks/useAlarmCenterMapping";
 import { useAlarmCenterStatus } from "@/hooks/useAlarmCenterStatus";
+import { useAlarmTimingConfig } from "@/hooks/useAlarmTimingConfig";
 import { palette, radius, spacing } from "@/theme/palette";
-import { ZONE_MODE_LABELS, type AlarmCenterMapping } from "@/types/domain";
+import { ZONE_MODE_LABELS, type AlarmCenterMapping, type AlarmTimingConfig } from "@/types/domain";
 
 const MAPPING_FIELDS: Array<{ key: keyof AlarmCenterMapping; label: string }> = [
   { key: "armedStateId", label: "Scharf-Status (armedStateId)" },
@@ -31,15 +32,23 @@ function StatusRow({ label, value, danger }: { label: string; value: string; dan
 export function AlarmCenterScreen(): React.JSX.Element {
   const { status, isOnline, error: statusError, sendCommand } = useAlarmCenterStatus();
   const { mapping, isLoading: mappingLoading, error: mappingError, save } = useAlarmCenterMapping();
+  const { config: timing, isLoading: timingLoading, error: timingError, save: saveTiming } = useAlarmTimingConfig();
 
   const [draft, setDraft] = useState<AlarmCenterMapping>(mapping);
   const [saving, setSaving] = useState(false);
+
+  const [timingDraft, setTimingDraft] = useState<AlarmTimingConfig>(timing);
+  const [timingSaving, setTimingSaving] = useState(false);
 
   useEffect(() => {
     setDraft(mapping);
   }, [mapping]);
 
-  if (!status || mappingLoading) {
+  useEffect(() => {
+    setTimingDraft(timing);
+  }, [timing]);
+
+  if (!status || mappingLoading || timingLoading) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator color={palette.accent} />
@@ -48,9 +57,15 @@ export function AlarmCenterScreen(): React.JSX.Element {
   }
 
   const dirty = JSON.stringify(draft) !== JSON.stringify(mapping);
+  const timingDirty = JSON.stringify(timingDraft) !== JSON.stringify(timing);
 
   function updateField(key: keyof AlarmCenterMapping, value: string): void {
     setDraft((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function updateTimingField(key: keyof AlarmTimingConfig, value: string): void {
+    const parsed = Number(value);
+    setTimingDraft((prev) => ({ ...prev, [key]: Number.isFinite(parsed) ? parsed : 0 }));
   }
 
   async function handleSave(): Promise<void> {
@@ -59,6 +74,15 @@ export function AlarmCenterScreen(): React.JSX.Element {
       await save(draft);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleSaveTiming(): Promise<void> {
+    setTimingSaving(true);
+    try {
+      await saveTiming(timingDraft);
+    } finally {
+      setTimingSaving(false);
     }
   }
 
@@ -97,6 +121,44 @@ export function AlarmCenterScreen(): React.JSX.Element {
           <Text style={styles.disarmLabel}>Alarm quittieren / unscharf schalten</Text>
         </Pressable>
       ) : null}
+
+      <GlassCard style={styles.card}>
+        <Text style={styles.cardTitle}>Verzögerungen</Text>
+        <Text style={styles.hint}>
+          Austrittsverzögerung nach dem Scharfschalten und Eintrittsverzögerung nach Türöffnung, jeweils in Sekunden.
+        </Text>
+
+        {timingError ? <Text style={styles.error}>{timingError}</Text> : null}
+
+        <Text style={styles.fieldLabel}>Austrittsverzögerung (Sekunden)</Text>
+        <TextInput
+          value={String(timingDraft.exitDelaySec)}
+          onChangeText={(text) => updateTimingField("exitDelaySec", text)}
+          keyboardType="numeric"
+          placeholderTextColor={palette.textSecondary}
+          style={styles.input}
+        />
+
+        <Text style={styles.fieldLabel}>Eintrittsverzögerung (Sekunden)</Text>
+        <TextInput
+          value={String(timingDraft.entryDelaySec)}
+          onChangeText={(text) => updateTimingField("entryDelaySec", text)}
+          keyboardType="numeric"
+          placeholderTextColor={palette.textSecondary}
+          style={styles.input}
+        />
+
+        <Pressable
+          onPress={() => void handleSaveTiming()}
+          disabled={!timingDirty || timingSaving}
+          style={({ pressed }) => [
+            styles.saveButton,
+            { opacity: !timingDirty || timingSaving ? 0.4 : pressed ? 0.7 : 1 },
+          ]}
+        >
+          <Text style={styles.saveLabel}>{timingSaving ? "Speichert…" : "Änderungen speichern"}</Text>
+        </Pressable>
+      </GlassCard>
 
       <GlassCard style={styles.card}>
         <Text style={styles.cardTitle}>Datenpunkt-Zuordnung</Text>

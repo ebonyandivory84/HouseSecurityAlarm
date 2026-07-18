@@ -5,16 +5,53 @@ import { ConditionGroupEditor } from "@/components/logic/ConditionGroupEditor";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useAllDatapoints } from "@/hooks/useAllDatapoints";
 import { useLogicRules } from "@/hooks/useLogicRules";
+import { useRuleTraceLog } from "@/hooks/useRuleTraceLog";
 import { useTelegramTemplates } from "@/hooks/useTelegramTemplates";
 import { palette, radius, spacing } from "@/theme/palette";
-import { createDefaultLogicRule, SCOPE_MODE_LABELS, type LogicRule, type ScopeMode } from "@/types/logic";
+import {
+  ACTION_TYPE_LABELS,
+  createDefaultLogicRule,
+  SCOPE_MODE_LABELS,
+  type LogicRule,
+  type RuleAction,
+  type ScopeMode,
+} from "@/types/logic";
 
 const SCOPE_MODES: ScopeMode[] = ["perimeter", "aussenhaut", "vollschutz"];
+
+function actionTargetId(action: RuleAction): string {
+  switch (action.type) {
+    case "setState":
+      return action.stateId;
+    case "telegram":
+      return action.templateId;
+    case "cameraLed":
+    case "cameraSiren":
+      return action.cameraId;
+  }
+}
+
+function formatRelativeTime(ts: number): string {
+  const diffSec = Math.max(0, Math.round((Date.now() - ts) / 1000));
+  if (diffSec < 5) {
+    return "gerade eben";
+  }
+  if (diffSec < 60) {
+    return `vor ${diffSec}s`;
+  }
+  const diffMin = Math.round(diffSec / 60);
+  if (diffMin < 60) {
+    return `vor ${diffMin}min`;
+  }
+  const diffHour = Math.round(diffMin / 60);
+  return `vor ${diffHour}h`;
+}
 
 export function LogikScreen(): React.JSX.Element {
   const { rules, isLoading, error, save } = useLogicRules();
   const { datapoints } = useAllDatapoints();
   const { templates: telegramTemplates } = useTelegramTemplates();
+  const { entries: traceEntries } = useRuleTraceLog();
   const [draft, setDraft] = useState<LogicRule[]>(rules);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -67,6 +104,22 @@ export function LogikScreen(): React.JSX.Element {
     <View style={styles.container}>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+        {traceEntries.length > 0 ? (
+          <GlassCard style={styles.card}>
+            <Text style={styles.fieldLabel}>Zuletzt ausgeführt</Text>
+            {traceEntries.map((entry, index) => (
+              <View key={`${entry.ruleId}-${entry.ts}-${index}`} style={styles.traceRow}>
+                <View style={styles.traceHeader}>
+                  <Text style={styles.traceName}>{entry.ruleName}</Text>
+                  <Text style={styles.traceTime}>{formatRelativeTime(entry.ts)}</Text>
+                </View>
+                <Text style={styles.hint}>
+                  {entry.actions.map((action) => `${ACTION_TYPE_LABELS[action.type]} → ${actionTargetId(action)}`).join(", ")}
+                </Text>
+              </View>
+            ))}
+          </GlassCard>
+        ) : null}
         {draft.length === 0 ? (
           <GlassCard style={styles.card}>
             <Text style={styles.hint}>Keine Regeln konfiguriert. Unten eine hinzufügen.</Text>
@@ -168,6 +221,10 @@ const styles = StyleSheet.create({
   content: { padding: spacing.lg, gap: spacing.md },
   card: { gap: spacing.sm },
   hint: { color: palette.textSecondary, fontSize: 14 },
+  traceRow: { gap: 2, paddingVertical: 4 },
+  traceHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  traceName: { color: palette.textPrimary, fontSize: 14, fontWeight: "600" },
+  traceTime: { color: palette.textSecondary, fontSize: 12 },
   rowHeader: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   nameInput: {
     flex: 1,

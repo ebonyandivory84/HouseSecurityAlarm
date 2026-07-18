@@ -1,3 +1,4 @@
+// SYNC: adapter/src/config/types.ts ↔ frontend/src/types/domain.ts — bei Änderung beide Seiten pflegen
 export interface DatapointConfig {
   id: string;
   category: "camera" | "motion" | "door" | "presence" | "brightness" | "custom";
@@ -17,6 +18,7 @@ export interface DatapointConfig {
   enabled: boolean;
 }
 
+// SYNC: adapter/src/config/types.ts ↔ frontend/src/types/logic.ts — bei Änderung beide Seiten pflegen
 export type ConditionLeaf = {
   kind: "leaf";
   datapointId: string;
@@ -44,6 +46,7 @@ export interface LogicRule {
   then: RuleAction[];
 }
 
+// SYNC: adapter/src/config/types.ts ↔ frontend/src/types/telegram.ts — bei Änderung beide Seiten pflegen
 export interface TelegramTemplate {
   id: string;
   triggerId: string;
@@ -77,4 +80,24 @@ export interface DayNightConfig {
 export interface PresenceConfig {
   datapointIds: string[];
   autoDisarmOnPresence: boolean;
+}
+
+export interface AlarmTimingConfig {
+  exitDelaySec: number;
+  entryDelaySec: number;
+}
+
+export interface FloorplanRoom {
+  id: string;
+  name: string;
+  zone: "perimeter" | "aussenhaut" | "innenraum" | null;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  datapointIds: string[];
+}
+
+export interface FloorplanConfig {
+  rooms: FloorplanRoom[];
 }

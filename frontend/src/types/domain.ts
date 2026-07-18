@@ -47,6 +47,7 @@ export interface CameraCapabilities {
   snapshotStateId?: string;
 }
 
+// SYNC: adapter/src/config/types.ts ↔ frontend/src/types/domain.ts — bei Änderung beide Seiten pflegen
 export interface DatapointConfig {
   id: string;
   category: DatapointCategory;
@@ -82,6 +83,7 @@ export function createDefaultDatapointConfig(
   };
 }
 
+// SYNC: adapter/src/config/types.ts ↔ frontend/src/types/domain.ts — bei Änderung beide Seiten pflegen
 export interface AlarmCenterMapping {
   armedStateId: string;
   perimeterStateId: string;
@@ -97,6 +99,7 @@ export interface AlarmCenterMapping {
 
 export type DayNightMode = "day" | "dusk" | "night";
 
+// SYNC: adapter/src/config/types.ts ↔ frontend/src/types/domain.ts — bei Änderung beide Seiten pflegen
 export interface DayNightConfig {
   duskOffsetMin: number;
   dawnOffsetMin: number;
@@ -111,7 +114,43 @@ export const DAY_NIGHT_MODE_LABELS: Record<DayNightMode, string> = {
   night: "Nacht",
 };
 
+// SYNC: adapter/src/config/types.ts ↔ frontend/src/types/domain.ts — bei Änderung beide Seiten pflegen
 export interface PresenceConfig {
   datapointIds: string[];
   autoDisarmOnPresence: boolean;
+}
+
+// SYNC: adapter/src/config/types.ts ↔ frontend/src/types/domain.ts — bei Änderung beide Seiten pflegen
+export interface AlarmTimingConfig {
+  exitDelaySec: number;
+  entryDelaySec: number;
+}
+
+// SYNC: adapter/src/config/types.ts ↔ frontend/src/types/domain.ts — bei Änderung beide Seiten pflegen
+export interface FloorplanRoom {
+  id: string;
+  name: string;
+  zone: "perimeter" | "aussenhaut" | "innenraum" | null;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  datapointIds: string[];
+}
+
+export interface FloorplanConfig {
+  rooms: FloorplanRoom[];
+}
+
+export function createDefaultFloorplanRoom(): FloorplanRoom {
+  return {
+    id: `room-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+    name: "Neuer Raum",
+    zone: null,
+    x: 10,
+    y: 10,
+    width: 30,
+    height: 30,
+    datapointIds: [],
+  };
 }

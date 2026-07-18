@@ -1,4 +1,11 @@
-import type { AlarmCenterMapping, DatapointConfig, DayNightConfig, PresenceConfig } from "./types";
+import type {
+  AlarmCenterMapping,
+  AlarmTimingConfig,
+  DatapointConfig,
+  DayNightConfig,
+  FloorplanConfig,
+  PresenceConfig,
+} from "./types";
 
 export const DEFAULT_DAY_NIGHT_CONFIG: DayNightConfig = {
   duskOffsetMin: 30,
@@ -22,6 +29,15 @@ export const DEFAULT_ALARM_CENTER_MAPPING: AlarmCenterMapping = {
   ledRedStateId: "",
   ledYellowStateId: "",
   fingerprintStateId: "",
+};
+
+export const DEFAULT_ALARM_TIMING_CONFIG: AlarmTimingConfig = {
+  exitDelaySec: 30,
+  entryDelaySec: 30,
+};
+
+export const DEFAULT_FLOORPLAN_CONFIG: FloorplanConfig = {
+  rooms: [],
 };
 
 export const DEFAULT_ZONE_BY_CATEGORY: Record<DatapointConfig["category"], DatapointConfig["zone"]> = {
