@@ -20,7 +20,9 @@ function parseJsonObject(raw, fallback) {
     }
     try {
         const parsed = JSON.parse(raw);
-        return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : fallback;
+        return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+            ? { ...fallback, ...parsed }
+            : fallback;
     }
     catch {
         return fallback;
