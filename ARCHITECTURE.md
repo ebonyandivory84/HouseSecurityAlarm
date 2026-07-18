@@ -403,12 +403,12 @@ Detaillierte 1:1-Zuordnung je Skript siehe Originaldatei.
 
 ## 12. Weiterarbeit — Empfohlene nächste Schritte
 
-Priorisiert nach Aufwand/Nutzen, keine Reihenfolge-Pflicht:
-1. Alarm-/Countdown-Event-Lücke schließen (Abschnitt 5/9 Punkt 1) — Voraussetzung für funktionierenden Sirenen-Countdown in Produktion.
-2. `ruleTrace`-Konsumenten im Frontend bauen (z.B. Debug-Ansicht in `LogikScreen`) oder bewusst als „nicht benötigt" verwerfen und aus dem `ServerMessage`-Typ entfernen.
-3. `PlaceholderScreen.tsx` löschen (toter Code).
-4. Floorplan-Feature entweder umsetzen oder aus dem Plan-Dokument als „verworfen" markieren.
-5. Frontend-/Backend-Typen synchronisieren (gemeinsames Package oder Codegen), um Drift zu vermeiden.
+Stand M10 (2026-07-19): alle 5 Punkte umgesetzt.
+1. ~~Alarm-/Countdown-Event-Lücke schließen~~ — erledigt via `adapter/src/core/alarmController.ts` (Austritts-/Eintrittsverzögerung aus `config.alarmTiming`, Panik-Befehl `commands.panic`).
+2. ~~`ruleTrace`-Konsumenten im Frontend bauen~~ — erledigt: `frontend/src/hooks/useRuleTraceLog.ts` + Panel „Zuletzt ausgeführt" in `LogikScreen.tsx`.
+3. ~~`PlaceholderScreen.tsx` löschen~~ — erledigt, inkl. Referenzen in `DrawerNavigator.tsx`.
+4. ~~Floorplan-Feature umsetzen~~ — erledigt als abstrakter Editor (Prozent-Koordinaten, kein Bild-Upload) mit Anzeige + Zonen-Steuerung: `frontend/src/screens/FloorplanScreen.tsx`, `useFloorplanConfig.ts`, Backend-Typ/Defaults/Route bereits vorhanden.
+5. ~~Frontend-/Backend-Typen synchronisieren~~ — kein Codegen (unverhältnismäßig für aktuellen Umfang), stattdessen Sync-Kommentare auf allen gespiegelten Typen in `adapter/src/config/types.ts` ↔ `frontend/src/types/{domain,logic,telegram}.ts`.
 
 ---
 
