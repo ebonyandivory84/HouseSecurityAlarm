@@ -5,10 +5,11 @@ import {
   DEFAULT_ALARM_CENTER_MAPPING,
   DEFAULT_ALARM_TIMING_CONFIG,
   DEFAULT_DAY_NIGHT_CONFIG,
-  DEFAULT_FLOORPLAN_CONFIG,
+  DEFAULT_FLOORPLAN_DESIGNER,
+  DEFAULT_FLOORPLAN_IMAGES,
   DEFAULT_PRESENCE_CONFIG,
 } from "../config/defaults";
-import type { DatapointConfig, FloorplanConfig } from "../config/types";
+import type { DatapointConfig, FloorplanDesignerData, FloorplanImagesConfig } from "../config/types";
 
 const ZONE_COMMANDS = ["armPerimeter", "armAussenhaut", "armVollschutz", "disarm"] as const;
 type ZoneCommand = (typeof ZONE_COMMANDS)[number];
@@ -124,7 +125,22 @@ export function registerRestRoutes(router: Router, deps: ApiDeps): void {
     DEFAULT_ALARM_CENTER_MAPPING,
     false
   );
-  registerJsonConfigRoute<FloorplanConfig>(router, "/floorplan", "config.floorplan", deps, DEFAULT_FLOORPLAN_CONFIG, false);
+  registerJsonConfigRoute<FloorplanDesignerData>(
+    router,
+    "/floorplan/designer",
+    "config.floorplanDesigner",
+    deps,
+    DEFAULT_FLOORPLAN_DESIGNER,
+    false
+  );
+  registerJsonConfigRoute<FloorplanImagesConfig>(
+    router,
+    "/floorplan/images",
+    "config.floorplanImages",
+    deps,
+    DEFAULT_FLOORPLAN_IMAGES,
+    false
+  );
   registerJsonConfigRoute(router, "/config/alarmtiming", "config.alarmTiming", deps, DEFAULT_ALARM_TIMING_CONFIG, false);
 
   router.get("/config/datapoints/:category", async (req: Request, res: Response) => {

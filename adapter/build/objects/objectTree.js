@@ -149,8 +149,12 @@ const states = [
         common: { name: "AlarmCenter-Zuordnung", type: "string", role: "json", read: true, write: true, def: "{}" },
     },
     {
-        _id: "config.floorplan",
-        common: { name: "Grundriss-Konfiguration", type: "string", role: "json", read: true, write: true, def: "{}" },
+        _id: "config.floorplanDesigner",
+        common: { name: "Grundriss-Designer", type: "string", role: "json", read: true, write: true, def: "{}" },
+    },
+    {
+        _id: "config.floorplanImages",
+        common: { name: "Grundriss-Hintergrundbilder", type: "string", role: "json", read: true, write: true, def: "{}" },
     },
     {
         _id: "config.alarmTiming",

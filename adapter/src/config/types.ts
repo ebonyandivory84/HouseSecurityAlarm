@@ -87,17 +87,77 @@ export interface AlarmTimingConfig {
   entryDelaySec: number;
 }
 
-export interface FloorplanRoom {
-  id: string;
-  name: string;
-  zone: "perimeter" | "aussenhaut" | "innenraum" | null;
+export type FloorplanItemType =
+  | "door" | "window" | "garagedoor" | "garage"
+  | "pavingDriveway" | "pavingTerrace" | "cameraZone" | "pirZone"
+  | "stairs" | "wc" | "washbasin" | "bathtub" | "shower" | "sink"
+  | "kitchen" | "stove" | "cabinet" | "sofa" | "tableRect" | "tableRound"
+  | "chair" | "beam";
+
+export interface FloorplanPoint {
   x: number;
   y: number;
-  width: number;
-  height: number;
-  datapointIds: string[];
 }
 
-export interface FloorplanConfig {
-  rooms: FloorplanRoom[];
+export interface FloorplanCoverageAnchor {
+  edge: "top" | "bottom" | "left" | "right";
+  t: number;
+}
+
+export interface FloorplanItem {
+  id: number;
+  type: FloorplanItemType;
+  x: number;
+  y: number;
+  r: number;
+  w: number;
+  h: number;
+  mirrorX: boolean;
+  coverageAnchor?: FloorplanCoverageAnchor;
+  alarmBindingType?: "contact" | "pir" | "camera";
+  alarmBindingKey?: string;
+  alarmBindingId?: string;
+}
+
+export interface FloorplanWall {
+  id: number;
+  points: FloorplanPoint[];
+  autoBeamLink?: boolean;
+  beamAId?: number;
+  beamBId?: number;
+}
+
+export interface FloorplanFloor {
+  items: FloorplanItem[];
+  walls: FloorplanWall[];
+  outerWallIds: number[];
+  perimeter: { x: number; y: number; w: number; h: number } | null;
+  nextId: number;
+  lastBeamItemId: number | null;
+}
+
+export interface FloorplanFloorView {
+  showBg: boolean;
+  useInOverviewOnly: boolean;
+  workspaceScale: number;
+  bgOffsetX: number;
+  bgOffsetY: number;
+}
+
+export interface FloorplanDesignerData {
+  version: number;
+  EG: FloorplanFloor;
+  OG: FloorplanFloor;
+  settings: {
+    snap: boolean;
+    grid: number;
+    floorView: { EG: FloorplanFloorView; OG: FloorplanFloorView };
+    showSensorsPreview: boolean;
+  };
+}
+
+export interface FloorplanImagesConfig {
+  egImageDataUri: string | null;
+  ogImageDataUri: string | null;
+  published: boolean;
 }

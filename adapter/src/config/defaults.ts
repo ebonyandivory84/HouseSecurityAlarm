@@ -3,7 +3,10 @@ import type {
   AlarmTimingConfig,
   DatapointConfig,
   DayNightConfig,
-  FloorplanConfig,
+  FloorplanDesignerData,
+  FloorplanFloor,
+  FloorplanFloorView,
+  FloorplanImagesConfig,
   PresenceConfig,
 } from "./types";
 
@@ -36,8 +39,46 @@ export const DEFAULT_ALARM_TIMING_CONFIG: AlarmTimingConfig = {
   entryDelaySec: 30,
 };
 
-export const DEFAULT_FLOORPLAN_CONFIG: FloorplanConfig = {
-  rooms: [],
+function createEmptyFloorplanFloor(): FloorplanFloor {
+  return {
+    items: [],
+    walls: [],
+    outerWallIds: [],
+    perimeter: null,
+    nextId: 1,
+    lastBeamItemId: null,
+  };
+}
+
+function createDefaultFloorplanFloorView(): FloorplanFloorView {
+  return {
+    showBg: true,
+    useInOverviewOnly: false,
+    workspaceScale: 1,
+    bgOffsetX: 0,
+    bgOffsetY: 0,
+  };
+}
+
+export const DEFAULT_FLOORPLAN_DESIGNER: FloorplanDesignerData = {
+  version: 1,
+  EG: createEmptyFloorplanFloor(),
+  OG: createEmptyFloorplanFloor(),
+  settings: {
+    snap: true,
+    grid: 4,
+    floorView: {
+      EG: createDefaultFloorplanFloorView(),
+      OG: createDefaultFloorplanFloorView(),
+    },
+    showSensorsPreview: true,
+  },
+};
+
+export const DEFAULT_FLOORPLAN_IMAGES: FloorplanImagesConfig = {
+  egImageDataUri: null,
+  ogImageDataUri: null,
+  published: false,
 };
 
 export const DEFAULT_ZONE_BY_CATEGORY: Record<DatapointConfig["category"], DatapointConfig["zone"]> = {

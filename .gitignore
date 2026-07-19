@@ -7,3 +7,4 @@ frontend/node_modules/
 .expo-shared/
 dist/
 web-build/
+.migration-data/
