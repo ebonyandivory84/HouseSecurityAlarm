@@ -103,4 +103,7 @@ Bindungs-Typkonstraint: `pir`→nur `pirZone`, `camera`→nur `cameraZone`,
 ### Verifikation
 - [ ] Dev-Server manueller Test (Wand zeichnen, Item platzieren, Sensor binden, Undo, EG/OG, Hintergrundbild, Publish)
 - [ ] Realer Grundriss lädt/rendert korrekt inkl. Live-Highlight
-- [ ] Production-Build deployed, Rauchtest gegen Port 8110
+- [x] Production-Build deployed, Rauchtest gegen Port 8110
+      (`npx expo export -p web` → `adapter/www/`, committed `5c8f7ae`, deployed via `iobroker stop/url/start`;
+      `GET /` → HTTP 200, `GET /floorplan/designer` → EG 60/OG 72 Items, `GET /floorplan/images` → HTTP 200,
+      `GET /config/datapoints/all` → 11 Einträge)
