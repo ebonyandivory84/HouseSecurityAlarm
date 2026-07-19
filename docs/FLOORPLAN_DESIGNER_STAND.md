@@ -92,10 +92,13 @@ Bindungs-Typkonstraint: `pir`→nur `pirZone`, `camera`→nur `cameraZone`,
 - [x] `npx tsc --noEmit` grün
 
 ### Migration
-- [ ] `floorplanDesignerJson` → `config.floorplanDesigner` auf Produktivinstanz geschrieben
-- [ ] EG.jpg/OG.jpg → Base64 → `config.floorplanImages` geschrieben
-- [ ] 11 gebundene Items → fehlende `DatapointConfig`-Einträge angelegt
-- [ ] `GET /floorplan/designer` liefert migrierte Daten auf Produktivinstanz
+- [x] `floorplanDesignerJson` → `config.floorplanDesigner` auf Produktivinstanz geschrieben
+      (via `PUT /housealarm/api/floorplan/designer`, verifiziert: EG 60/30/21, OG 72/38/21, perimeter{x:55,y:56,w:1296,h:927})
+- [x] EG.jpg/OG.jpg → Base64 → `config.floorplanImages` geschrieben
+      (via `PUT /housealarm/api/floorplan/images`, verifiziert: eg 161915B, og 190723B, published:true)
+- [x] 11 gebundene Items → fehlende `DatapointConfig`-Einträge angelegt
+      (via `PUT /housealarm/api/config/datapoints/:category`, je Kategorie: 4 camera/perimeter, 4 door/aussenhaut, 3 motion/innenraum, alle enabled:true, valueType:"boolean")
+- [x] `GET /floorplan/designer` liefert migrierte Daten auf Produktivinstanz (verifiziert)
 
 ### Verifikation
 - [ ] Dev-Server manueller Test (Wand zeichnen, Item platzieren, Sensor binden, Undo, EG/OG, Hintergrundbild, Publish)
