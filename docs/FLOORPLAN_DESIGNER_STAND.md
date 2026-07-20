@@ -101,9 +101,26 @@ Bindungs-Typkonstraint: `pir`→nur `pirZone`, `camera`→nur `cameraZone`,
 - [x] `GET /floorplan/designer` liefert migrierte Daten auf Produktivinstanz (verifiziert)
 
 ### Verifikation
-- [ ] Dev-Server manueller Test (Wand zeichnen, Item platzieren, Sensor binden, Undo, EG/OG, Hintergrundbild, Publish)
-- [ ] Realer Grundriss lädt/rendert korrekt inkl. Live-Highlight
 - [x] Production-Build deployed, Rauchtest gegen Port 8110
       (`npx expo export -p web` → `adapter/www/`, committed `5c8f7ae`, deployed via `iobroker stop/url/start`;
       `GET /` → HTTP 200, `GET /floorplan/designer` → EG 60/OG 72 Items, `GET /floorplan/images` → HTTP 200,
       `GET /config/datapoints/all` → 11 Einträge)
+- [x] Dev-Server startet fehlerfrei (`cd frontend && npm run web` → Metro Bundler, 961 Module,
+      `Web Bundled` ohne Fehler, `Waiting on http://localhost:8081`) — automatisiert geprüft
+- [ ] **Manueller Interaktions-Test (noch offen, erfordert echten Browser durch Nutzer):**
+      Wand zeichnen, Item platzieren, Sensor binden, Undo, EG/OG wechseln, Hintergrundbild hochladen,
+      Publish-Toggle. Nicht automatisierbar — kein Browser-Tool in dieser Session verfügbar, daher
+      hier bewusst nicht als erledigt markiert (Projektregel: UI-Verifikation nicht ohne echten
+      Browser-Test als erfolgreich melden).
+      **Ablauf für den Nutzer:**
+      1. `cd frontend && npm run web` (lokal, Port 8081)
+      2. Für echte Produktivdaten (statt leerem Frontend-Default) im ioBroker-Admin bei der
+         `housesecurityalarm.0`-Instanz `devServerUrl` = `http://<mac-ip>:8081` setzen und
+         `enableDevProxy` aktivieren (siehe `admin/jsonConfig.json`) — dies wurde in dieser Session
+         **bewusst nicht automatisiert gesetzt**, da es eine Live-Sicherheitsinstanz ist und
+         Produktiv-Config-Änderungen ohne Rückfrage vermieden werden.
+      3. Browser auf `http://192.168.44.31:8110/` öffnen (Server proxyt Assets zum Dev-Server,
+         API-Calls bleiben gegen die echte Produktivinstanz)
+      4. Checkliste oben durchgehen
+- [ ] Realer Grundriss lädt/rendert korrekt inkl. Live-Highlight (Teil desselben manuellen Tests,
+      inkl. simuliertem Sensor-Trigger zur Prüfung von `useFloorplanLiveBindings.ts`)
